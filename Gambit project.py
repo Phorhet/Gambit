@@ -2,6 +2,7 @@ import sqlite3
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QListWidget, QTabWidget, \
     QTextEdit, QPlainTextEdit, QLabel
+from qt_material import apply_stylesheet
 
 # from PyQt6 import QtCore, Qt
 
@@ -78,6 +79,7 @@ class GambitWindow(QWidget):
         self.history_list.clear()
         self.history_list.addItem(result[2])
 
+
     # def keyPressEvent(self, event):
     # if event.key() == Qt.Key_Return:
     # self.on_click()
@@ -85,5 +87,6 @@ class GambitWindow(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    apply_stylesheet(app, theme='light_cyan_500.xml')
     ex = GambitWindow()
     sys.exit(app.exec())
