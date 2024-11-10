@@ -1,14 +1,23 @@
 import sqlite3
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QListWidget, QTabWidget, \
-    QTextEdit, QPlainTextEdit, QLabel
+    QTextEdit, QPlainTextEdit, QLabel, QMessageBox
 from qt_material import apply_stylesheet
 
-# from PyQt6 import QtCore, Qt
+from PyQt6.QtCore import Qt
 
 
 con = sqlite3.connect(r"C:\Users\Роман\PycharmProjects\pythonProject\Chess")
 cur = con.cursor()
+
+
+def show_welcome_message():
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Icon.Information)
+    msg.setText("Добро пожаловать в наше приложение!")
+    msg.setWindowTitle("Приветствие")
+    msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+    msg.exec()
 
 
 class GambitWindow(QWidget):
@@ -23,14 +32,25 @@ class GambitWindow(QWidget):
             all.append(i[1])
         return all
 
+    def enter_pressed(self):
+        self.search()
+        #print(self.search_line_edit.text())
+
+
+
+
     def initUI(self):
         tabs = QTabWidget()
         search_tab = QWidget()
         search_layout = QVBoxLayout()
         self.search_line_edit = QLineEdit()
+        self.search_line_edit.returnPressed.connect(self.enter_pressed)
         self.search_line_edit.setClearButtonEnabled(True)
         search_button = QPushButton("Поиск")
         search_button.clicked.connect(self.search)
+        #event = Qt.Key.Key_Enter
+        #if event == Qt.Key.Key_Enter:
+            #self.on_click.search
         search_layout.addWidget(self.search_line_edit)
         search_layout.addWidget(search_button)
         self.history_list = QListWidget()
@@ -48,6 +68,7 @@ class GambitWindow(QWidget):
         self.save_area_edit.setPlaceholderText("Информация про Гамбит")
         info_layout.addWidget(self.save_line_edit)
         save_button = QPushButton("Save")
+        save_button.clicked.connect(self.save_base)
         info_layout.addWidget(self.save_area_edit)
         info_layout.addWidget(save_button)
         info_tab.setLayout(info_layout)
@@ -60,7 +81,7 @@ class GambitWindow(QWidget):
         gambits_layout.addWidget(self.gambits_list)
         gambits_tab.setLayout(gambits_layout)
         tabs.addTab(search_tab, "Поиск")
-        tabs.addTab(info_tab, "Информация")
+        tabs.addTab(info_tab, "Добавление данных")
         tabs.addTab(gambits_tab, "Гамбиты")
 
         main_layout = QVBoxLayout()
@@ -79,13 +100,20 @@ class GambitWindow(QWidget):
         self.history_list.addItem(result[2])
 
 
-    # def keyPressEvent(self, event):
-    # if event.key() == Qt.Key_Return:
-    # self.on_click()
+    def save_base(self):
+        save_textfl = self.save_line_edit.text()
+        save_textsl = self.save_area_edit.toPlainText()
+        try:
+            save = cur.execute("""INSERT INTO gambit(name, description) VALUES(?,?); """, (save_textfl, save_textsl))
+            con.commit()
+            print(cur.lastrowid)
+        except:
+            print("something went wrong")
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     apply_stylesheet(app, theme='light_cyan_500.xml')
+    show_welcome_message()
     ex = GambitWindow()
     sys.exit(app.exec())
