@@ -1,11 +1,10 @@
 import sqlite3
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QListWidget, QTabWidget, \
-    QTextEdit, QPlainTextEdit, QLabel, QMessageBox, QScrollBar, QTextBrowser
+    QTextEdit, QPlainTextEdit, QLabel, QMessageBox, QTextBrowser
 from qt_material import apply_stylesheet
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
-
 
 con = sqlite3.connect(r"C:\Users\Роман\PycharmProjects\pythonProject\Chess")
 cur = con.cursor()
@@ -31,6 +30,7 @@ class AnotherWindow(QWidget):
         self.setLayout(layout)
         self.setGeometry(500, 300, 400, 500)
 
+
 class GambitWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -46,7 +46,6 @@ class GambitWindow(QWidget):
 
     def enter_pressed(self):
         self.search()
-
 
     def initUI(self):
         tabs = QTabWidget()
@@ -96,15 +95,16 @@ class GambitWindow(QWidget):
         self.show()
 
     def search(self):
-        search_text = "%" + self.search_line_edit.text() + "%"
-        print(search_text)
-        result = cur.execute("""select * from gambit where name like ?""", (search_text,)).fetchone()
-        print(result[2])
+        search_text = "%" + self.search_line_edit.text().lower() + "%"
+        result = cur.execute("""select * from gambit where name  like  ?""", (search_text,)).fetchone()
         self.history_list.clear()
-        self.history_list.setText(result[2])
+        if result is not None:
+            self.history_list.setText(result[2])
+        else:
+            self.history_list.setText("Ошибка, Гамбит не был обнаружен")
 
     def save_base(self):
-        save_textfl = self.save_line_edit.text()
+        save_textfl = self.save_line_edit.text().lower()
         save_textsl = self.save_area_edit.toPlainText()
         try:
             save = cur.execute(""""INSERT INTO gambit(name, description) VALUES(?,?); """, (save_textfl, save_textsl))
@@ -132,7 +132,3 @@ if __name__ == '__main__':
     show_welcome_message()
     ex = GambitWindow()
     sys.exit(app.exec())
-
-
-
-
