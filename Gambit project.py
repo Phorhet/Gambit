@@ -2,14 +2,13 @@ import sqlite3
 import sys
 import time
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QListWidget, QTabWidget, \
-    QTextEdit, QPlainTextEdit, QLabel, QMessageBox, QTextBrowser
+    QTextEdit, QPlainTextEdit, QLabel, QMessageBox, QTextBrowser, QFormLayout, QGridLayout, QLineEdit
 from qt_material import apply_stylesheet
 #from PyQt6 import uic
 from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QWidget,  QFormLayout, QGridLayout, QTabWidget, QLineEdit, QDateEdit, QPushButton
 
-con = sqlite3.connect(r"C:\Users\Роман\PycharmProjects\pythonProject\Chess")
+PATH = 'C:\\Users\\Роман\\PycharmProjects\\pythonProject1\\'
+con = sqlite3.connect(PATH + "Chess")
 cur = con.cursor()
 
 
@@ -23,7 +22,7 @@ def show_welcome_message():
 
 
 class AnotherWindow(QWidget):
-    def __init__(self, name):
+    def __init__(self, description, image_name):
         super().__init__()
         """#uic.loadUi('combined.ui', self)
         self.name = name
@@ -37,6 +36,8 @@ class AnotherWindow(QWidget):
         pic_tab = QWidget()
         pic_layout = QVBoxLayout()
         tab.addTab(pic_tab, "картинка гамбита")"""
+        self.image_name = image_name
+        print(self.image_name)
         self.setWindowTitle('PyQt QTabWidget')
         main_layout = QGridLayout(self)
         self.setLayout(main_layout)
@@ -45,14 +46,14 @@ class AnotherWindow(QWidget):
         text_page = QWidget(self)
         layout = QFormLayout()
         text_page.setLayout(layout)
-        self.name = name
+        self.description = description
         self.text_browser = QTextBrowser()
-        self.text_browser.setText(name)
+        self.text_browser.setText(description)
         layout.addWidget(self.text_browser)
         # Image tab
         image_page = QWidget(self)
         layout = QFormLayout()
-        self.im = QPixmap(r"C:\Users\Роман\PycharmProjects\pythonProject1\Images\ferzevi.jpeg")
+        self.im = QPixmap(PATH + "Images\\" + self.image_name)
         self.label = QLabel()
         self.label.setPixmap(self.im)
  #       self.grid = QGridLayout()
@@ -158,7 +159,8 @@ class GambitWindow(QWidget):
             (clicked_name,)
         ).fetchone()
         if result is not None:
-            self.w = AnotherWindow(result[2])
+            print(result)
+            self.w = AnotherWindow(result[2], result[3])
             self.w.show()
         else:
             QMessageBox.warning(self, "Ошибка", "Гамбит не найден")
