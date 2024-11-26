@@ -1,10 +1,13 @@
 import sqlite3
 import sys
+import time
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QListWidget, QTabWidget, \
     QTextEdit, QPlainTextEdit, QLabel, QMessageBox, QTextBrowser
 from qt_material import apply_stylesheet
+#from PyQt6 import uic
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QApplication, QWidget,  QFormLayout, QGridLayout, QTabWidget, QLineEdit, QDateEdit, QPushButton
 
 con = sqlite3.connect(r"C:\Users\Роман\PycharmProjects\pythonProject\Chess")
 cur = con.cursor()
@@ -22,6 +25,7 @@ def show_welcome_message():
 class AnotherWindow(QWidget):
     def __init__(self, name):
         super().__init__()
+        """#uic.loadUi('combined.ui', self)
         self.name = name
         layout = QVBoxLayout()
         self.text_browser = QTextBrowser()
@@ -29,6 +33,38 @@ class AnotherWindow(QWidget):
         layout.addWidget(self.text_browser)
         self.setLayout(layout)
         self.setGeometry(500, 300, 400, 500)
+        tab = QTabWidget()
+        pic_tab = QWidget()
+        pic_layout = QVBoxLayout()
+        tab.addTab(pic_tab, "картинка гамбита")"""
+        self.setWindowTitle('PyQt QTabWidget')
+        main_layout = QGridLayout(self)
+        self.setLayout(main_layout)
+        tab = QTabWidget(self)
+        # Text tab
+        text_page = QWidget(self)
+        layout = QFormLayout()
+        text_page.setLayout(layout)
+        self.name = name
+        self.text_browser = QTextBrowser()
+        self.text_browser.setText(name)
+        layout.addWidget(self.text_browser)
+        # Image tab
+        image_page = QWidget(self)
+        layout = QFormLayout()
+        self.im = QPixmap(r"C:\Users\Роман\PycharmProjects\pythonProject1\Images\ferzevi.jpeg")
+        self.label = QLabel()
+        self.label.setPixmap(self.im)
+ #       self.grid = QGridLayout()
+  #      self.grid.addWidget(self.label,1,1)
+ #       self.setLayout(self.grid)
+        layout.addWidget(self.label)
+        image_page.setLayout(layout)
+        tab.addTab(text_page, 'Text')
+        tab.addTab(image_page, 'Image')
+        main_layout.addWidget(tab, 0, 0, 2, 1)
+        self.setGeometry(500, 300, 400, 500)
+        self.show()
 
 
 class GambitWindow(QWidget):
@@ -100,8 +136,10 @@ class GambitWindow(QWidget):
         self.history_list.clear()
         if result is not None:
             self.history_list.setText(result[2])
+#            self.text = result[2]
         else:
             self.history_list.setText("Ошибка, Гамбит не был обнаружен")
+#            self.text = "Ошибка, Гамбит не был обнаружен"
 
     def save_base(self):
         save_textfl = self.save_line_edit.text().lower()
