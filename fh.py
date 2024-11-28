@@ -1,9 +1,9 @@
 import sqlite3
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QListWidget, QTabWidget, \
-    QPlainTextEdit, QLabel, QMessageBox, QTextBrowser, QFormLayout, QGridLayout, QLineEdit, QComboBox
+    QTextEdit, QPlainTextEdit, QLabel, QMessageBox, QTextBrowser, QFormLayout, QGridLayout, QLineEdit
 from qt_material import apply_stylesheet
-from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtGui import QPixmap
 
 PATH = 'C:\\Users\\Роман\\PycharmProjects\\pythonProject1\\'
 con = sqlite3.connect(PATH + "Chess")
@@ -30,12 +30,10 @@ class AnotherWindow(QWidget):
     def __init__(self, description, image_name):
         super().__init__()
         self.image_name = image_name
-        print(self.image_name)
         self.setWindowTitle('PyQt QTabWidget')
         main_layout = QGridLayout(self)
         self.setLayout(main_layout)
         tab = QTabWidget(self)
-        # Text tab
         text_page = QWidget(self)
         layout = QFormLayout()
         text_page.setLayout(layout)
@@ -43,7 +41,6 @@ class AnotherWindow(QWidget):
         self.text_browser = QTextBrowser()
         self.text_browser.setText(description)
         layout.addWidget(self.text_browser)
-        # Image tab
         image_page = QWidget(self)
         layout = QFormLayout()
         self.im = QPixmap(PATH + "Images\\" + self.image_name)
@@ -75,10 +72,6 @@ class GambitWindow(QWidget):
         self.search()
 
     def initUI(self):
-        self.combobox = QComboBox()
-        self.combobox.addItem('Информация')
-        self.combobox.addItem('Свзяь')
-        #Таб поиска
         tabs = QTabWidget()
         search_tab = QWidget()
         search_layout = QVBoxLayout()
@@ -92,7 +85,6 @@ class GambitWindow(QWidget):
         self.history_list = QTextBrowser()
         search_layout.addWidget(self.history_list)
         search_tab.setLayout(search_layout)
-        # таб для сохранения
         info_tab = QWidget()
         info_layout = QVBoxLayout()
         self.save_line_edit = QLineEdit()
@@ -100,16 +92,12 @@ class GambitWindow(QWidget):
         self.save_line_edit.setPlaceholderText("Имя Гамбита")
         self.save_area_edit = QPlainTextEdit()
         self.save_area_edit.setPlaceholderText("Информация про Гамбит")
-        self.save_photo_name_edit = QLineEdit()
-        self.save_photo_name_edit.setPlaceholderText("Имя изображения")
         info_layout.addWidget(self.save_line_edit)
         save_button = QPushButton("Save")
         save_button.clicked.connect(self.save_base)
         info_layout.addWidget(self.save_area_edit)
-        info_layout.addWidget(self.save_photo_name_edit)
         info_layout.addWidget(save_button)
         info_tab.setLayout(info_layout)
-        # таб гамбиты
         gambits_tab = QWidget()
         gambits_layout = QVBoxLayout()
         self.gambits_list = QListWidget()
@@ -117,12 +105,10 @@ class GambitWindow(QWidget):
         gambits_layout.addWidget(self.gambits_list)
         gambits_tab.setLayout(gambits_layout)
         self.gambits_list.itemDoubleClicked.connect(self.doubleclickmouse)
-        #Табы и лаяут
         tabs.addTab(search_tab, "Поиск")
         tabs.addTab(info_tab, "Добавление данных")
         tabs.addTab(gambits_tab, "Гамбиты")
         main_layout = QVBoxLayout()
-        main_layout.addWidget(self.combobox)
         main_layout.addWidget(tabs)
         self.setLayout(main_layout)
         self.setGeometry(300, 100, 400, 500)
@@ -141,10 +127,8 @@ class GambitWindow(QWidget):
     def save_base(self):
         save_textfl = self.save_line_edit.text().lower()
         save_textsl = self.save_area_edit.toPlainText()
-        save_photo = self.save_photo_name_edit.text()
         try:
-            save = cur.execute("""INSERT INTO gambit(name, description, image_fnane) VALUES(?,?,?); """
-                               , (save_textfl, save_textsl, save_photo))
+            save = cur.execute(""""INSERT INTO gambit(name, description) VALUES(?,?); """, (save_textfl, save_textsl))
             con.commit()
         except:
             QMessageBox.warning(self, "Ошибка", " Не удалось сделать сохранение информации в базу данных")
