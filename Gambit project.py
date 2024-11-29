@@ -1,9 +1,9 @@
 import sqlite3
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QListWidget, QTabWidget, \
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QListWidget, QTabWidget, \
     QPlainTextEdit, QLabel, QMessageBox, QTextBrowser, QFormLayout, QGridLayout, QLineEdit, QComboBox
 from qt_material import apply_stylesheet
-from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtGui import QPixmap
 
 PATH = 'C:\\Users\\Роман\\PycharmProjects\\pythonProject1\\'
 con = sqlite3.connect(PATH + "Chess")
@@ -14,14 +14,17 @@ def show_welcome_message():
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Icon.Information)
     msg.setText(
-        "Добро пожаловать в наше приложение!\n\n"
+        "Добро пожаловать в Проект Гамбит!\n\n"
         "В нашем приложении вы можете:\n"
         "- Ввести название дебюта или гамбита в поисковую строку и получить информацию.\n"
         "- Во второй вкладке пополнить базу данных новой информацией.\n"
         "- В третьей вкладке просмотреть содержимое базы данных.\n"
         "- Двойной клик на элемент откроет новое окно с подробностями и изображением.\n"
+        "- Имеется удобный dropbox с информацией которая выводится по клику\n"
+        "- В будущем планируются доработки интерфейса и функционала.\n"
+        "- Хорошего время препровождения! \n"
     )
-    msg.setWindowTitle("Приветствие")
+    msg.setWindowTitle("Приветствуем Пользователь!")
     msg.setStandardButtons(QMessageBox.StandardButton.Ok)
     msg.exec()
 
@@ -77,8 +80,11 @@ class GambitWindow(QWidget):
     def initUI(self):
         self.combobox = QComboBox()
         self.combobox.addItem('Информация')
-        self.combobox.addItem('Свзяь')
-        #Таб поиска
+        self.combobox.addItem('О приложении')
+        self.combobox.addItem('Вопросы которые могут возникнуть')
+        self.combobox.addItem('Связь')
+        self.combobox.setObjectName('myComboBox')
+        self.combobox.currentIndexChanged.connect(self.on_combobox_changed)
         tabs = QTabWidget()
         search_tab = QWidget()
         search_layout = QVBoxLayout()
@@ -92,7 +98,6 @@ class GambitWindow(QWidget):
         self.history_list = QTextBrowser()
         search_layout.addWidget(self.history_list)
         search_tab.setLayout(search_layout)
-        # таб для сохранения
         info_tab = QWidget()
         info_layout = QVBoxLayout()
         self.save_line_edit = QLineEdit()
@@ -109,7 +114,6 @@ class GambitWindow(QWidget):
         info_layout.addWidget(self.save_photo_name_edit)
         info_layout.addWidget(save_button)
         info_tab.setLayout(info_layout)
-        # таб гамбиты
         gambits_tab = QWidget()
         gambits_layout = QVBoxLayout()
         self.gambits_list = QListWidget()
@@ -117,7 +121,6 @@ class GambitWindow(QWidget):
         gambits_layout.addWidget(self.gambits_list)
         gambits_tab.setLayout(gambits_layout)
         self.gambits_list.itemDoubleClicked.connect(self.doubleclickmouse)
-        #Табы и лаяут
         tabs.addTab(search_tab, "Поиск")
         tabs.addTab(info_tab, "Добавление данных")
         tabs.addTab(gambits_tab, "Гамбиты")
@@ -129,9 +132,39 @@ class GambitWindow(QWidget):
         self.setWindowTitle('Гамбит')
         self.show()
 
+    def on_combobox_changed(self, index):
+        if index == 1:
+            msg = QMessageBox.information(self, 'О приложении', "В нашем приложении вы можете:\n"
+        "- Ввести название дебюта или гамбита в поисковую строку и получить информацию.\n"
+        "- Во второй вкладке пополнить базу данных новой информацией.\n"
+        "- В третьей вкладке просмотреть содержимое базы данных.\n"
+        "- Двойной клик на элемент откроет новое окно с подробностями и изображением.\n"
+    )
+        elif index == 2:
+            msg = QMessageBox.warning(self, 'Вопросы', "При работе с приложением у вас могут быть вопросы:\n"
+        "- Что будет если я неправильно введу имя Гамбита или Дебюта?\n"
+        "- Ничего страшного не случится.У вас просто появится сообщение о ошибке что нет гамбита данного\n"
+        "- Я не знаю не одного названия.Что делать?\n"
+        "- Откройте последнюю Гамбиты.Там будут данные из БД. Двойной клик на элемент откроет новое окно с данными.\n"
+        "- Зачем нужна вкладка с добовление информации?\n"
+        "- Данная вкладка нужна для добовлении данных в БД если вы что-то не смогли найти. \n"
+        "- Таким образом вы сможете сами внести вклад в развитие проекта! \n"
+        "- Как с вами связаться?\n"
+        "- В том же dropbox есть вкладка связь. Нажмите на неё и вы увидете почту по который вы можете связаться\n"
+    )
+        elif index == 3:
+            msg = QMessageBox.warning(self, 'Связь', "Если вы не нашли ответ на вопрос или что-то еще.\n"
+        "-То вы можете спокойно с нами связаться. \n"
+        "-Вот наша почта:********@neyandex.ru \n"
+        "- Мы на связи 24/7.\n"
+        "- Обращайтесь если найдете недостатки или будут вопросы на которые нет ответа.\n"
+    )
+
+
     def search(self):
         search_text = "%" + self.search_line_edit.text().lower() + "%"
-        result = cur.execute("""select * from gambit where name  like  ?""", (search_text,)).fetchone()
+        result = cur.execute(
+            """select * from gambit where name  like  ?""", (search_text,)).fetchone()
         self.history_list.clear()
         if result is not None:
             self.history_list.setText(result[2])
@@ -143,7 +176,8 @@ class GambitWindow(QWidget):
         save_textsl = self.save_area_edit.toPlainText()
         save_photo = self.save_photo_name_edit.text()
         try:
-            save = cur.execute("""INSERT INTO gambit(name, description, image_fnane) VALUES(?,?,?); """
+            save = cur.execute(
+                """INSERT INTO gambit(name, description, image_fnane) VALUES(?,?,?); """
                                , (save_textfl, save_textsl, save_photo))
             con.commit()
         except:
