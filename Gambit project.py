@@ -1,14 +1,14 @@
 import sqlite3
 import sys
+import os
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QListWidget, QTabWidget, \
     QPlainTextEdit, QLabel, QMessageBox, QTextBrowser, QFormLayout, QGridLayout, QLineEdit, QComboBox
 from qt_material import apply_stylesheet
 from PyQt6.QtGui import QPixmap
 
-PATH = 'C:\\Users\\Роман\\PycharmProjects\\pythonProject1\\'
-con = sqlite3.connect(PATH + "Chess")
+PATH = os.path.join(os.getcwd(), "Chess")
+con = sqlite3.connect(PATH)
 cur = con.cursor()
-
 
 def show_welcome_message():
     msg = QMessageBox()
