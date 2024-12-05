@@ -1,13 +1,14 @@
 import sqlite3
 import sys
+import re
 import os
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QListWidget, QTabWidget, \
     QPlainTextEdit, QLabel, QMessageBox, QTextBrowser, QFormLayout, QGridLayout, QLineEdit, QComboBox
 from qt_material import apply_stylesheet
 from PyQt6.QtGui import QPixmap
 
-PATH = os.path.join(os.getcwd(), "Chess")
-con = sqlite3.connect(PATH)
+PATH = os.getcwd()
+con = sqlite3.connect((PATH + r"\Chess"))
 cur = con.cursor()
 
 def show_welcome_message():
@@ -49,7 +50,7 @@ class AnotherWindow(QWidget):
         # Image tab
         image_page = QWidget(self)
         layout = QFormLayout()
-        self.im = QPixmap(PATH + "Images\\" + self.image_name)
+        self.im = QPixmap(PATH + "\\Images\\" + self.image_name)
         self.label = QLabel()
         self.label.setPixmap(self.im)
         layout.addWidget(self.label)
@@ -165,7 +166,7 @@ class GambitWindow(QWidget):
 
 
     def search(self):
-        search_text = "%" + self.search_line_edit.text().lower() + "%"
+        search_text = "%" + re.sub(r"\s+"," ",self.search_line_edit.text()).lower().strip() + "%"
         result = cur.execute(
             """select * from gambit where name  like  ?""", (search_text,)).fetchone()
         self.history_list.clear()
